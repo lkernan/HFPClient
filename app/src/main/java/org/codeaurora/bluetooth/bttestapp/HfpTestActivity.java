@@ -415,6 +415,7 @@ public class HfpTestActivity extends MonkeyActivity implements IBluetoothConnect
         } else {
             Logger.v(TAG,"mBluetoothHeadsetClient is null");
         }
+        checkCallingIntent(getIntent());
         super.onResume();
     }
 
@@ -440,6 +441,33 @@ public class HfpTestActivity extends MonkeyActivity implements IBluetoothConnect
             Logger.v(TAG,"mBluetoothHeadsetClient is null");
         }
         super.onPause();
+    }
+                
+    @Override
+    protected void onNewIntent(Intent intent) {
+        checkCallingIntent(intent);
+        super.onNewIntent(intent);
+    }
+
+    public void checkCallingIntent(Intent intent) {
+        if (intent == null) return;
+
+        String phoneNumber = null;
+
+        if (intent.getData() != null) {
+            phoneNumber = intent.getData().toString();
+        } else {
+            phoneNumber = intent.getStringExtra("android.intent.extra.PHONE_NUMBER");
+        }
+
+        if (phoneNumber != null) {
+            if (phoneNumber.startsWith("tel:")) {
+                phoneNumber = phoneNumber.substring(4);
+            }
+
+            EditText dialpad_number = mDialpadFragment.getView().findViewById(R.id.dialpad_number);
+            dialpad_number.setText(phoneNumber);
+        }
     }
 
     @Override
